@@ -27,13 +27,3 @@ VoIP Engineer | Open-Source Developer | Remote Troubleshooting Specialist
 ![VoIP](https://img.shields.io/badge/-VoIP-FF6B6B?style=flat)
 ![SIP](https://img.shields.io/badge/-SIP-4CAF50?style=flat)
 ```
-
-Bu profile README, GitHub'da senin profiline girenler tarafından **ilk görülen şey** olacak.
-
----
-
-## ✅ **Son Kontrol**
-
-Repo'nun URL'ini bana söyler misin? Şu formatta olmalı:
-```
-https://github.com/YOUR-USERNAME/voipscope

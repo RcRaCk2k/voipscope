@@ -401,7 +401,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 **Emre Karayazgan**
 - VoIP/Network Engineer
-- LinkedIn: [(https://www.linkedin.com/in/emre-karayazgan/)](https://www.linkedin.com/in/emre-karayazgan/)
+- LinkedIn: [[(https://www.linkedin.com/in/emre-karayazgan/)](https://www.linkedin.com/in/emre-karayazgan/)]
 - GitHub: [[(https://github.com/emrekarayazgan)](https://github.com/emrekarayazgan)]
 
 ---
@@ -418,8 +418,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For bug reports, feature requests, or questions:
 - Open an issue on GitHub
-- Email: [emre.karayazgan@gmail.com]
-- LinkedIn: [[Your LinkedIn](https://www.linkedin.com/in/emre-karayazgan/)]
+- Email: [[emre.karayazgan@gmail.com](mailto:emre.karayazgan@gmail.com)]
+- LinkedIn: [[(https://www.linkedin.com/in/emre-karayazgan/)](https://www.linkedin.com/in/emre-karayazgan/)]
 
 ---
 

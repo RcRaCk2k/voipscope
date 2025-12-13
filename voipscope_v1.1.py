@@ -8,6 +8,11 @@ Tagline: "See beyond the call"
 NEW in v1.1:
 - Clipped Audio Detection (SIP-to-RTP delay measurement)
 - Detects delayed media start after call establishment
+- Clipped Audio Detection
+- Silent Call Detection
+- Call Setup Delay Analysis
+- Codec Mismatch Warnings
+- DTMF Detection (RFC2833)
 
 Features:
 - Automatic SIP/RTP analysis
@@ -21,13 +26,13 @@ Features:
 
 Author: Emre Karayazgan
 License: MIT
-Website: https://github.com/voipscope
+Website: https://github.com/emrekarayazgan/voipscope
 
 Requirements:
   pip install pyshark pandas openpyxl
 
 Usage:
-  python voipscope_v1.py
+  python voipscope_v1.1.py
 """
 
 import os
@@ -1166,8 +1171,12 @@ def main():
     
     print(f"\n{'='*70}")
     print("Thank you for using VoIPScope v1.1!")
-    print("NEW: Clipped Audio Detection - detects delayed media start")
-    print("For updates and support: https://github.com/voipscope")
+    print("NEW: Clipped Audio Detection")
+    print("NEW: Silent Call Detection")
+    print("NEW: Call Setup Delay Analysis")
+    print("NEW: Codec Mismatch Warnings")
+    print("NEW: DTMF Detection (RFC2833)")
+    print("For updates and support: https://github.com/emrekarayazgan/voipscope")
     print(f"{'='*70}\n")
 
 if __name__ == '__main__':

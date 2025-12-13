@@ -737,7 +737,7 @@ python voipscope_v1.py
 
 ## 📝 Changelog
 
-### v1.1 - Enhanced Edition (December 2024)
+### v1.1 - Enhanced Edition (December 2025)
 
 **New Features:**
 - ✨ **Clipped Audio Detection**
@@ -786,7 +786,7 @@ python voipscope_v1.py
 - Call setup: 3s (warning), 6s (high)
 - DTMF payload type: 101 (RFC2833 standard)
 
-### v1.0 - Core Edition (November 2024)
+### v1.0 - Core Edition (November 2025)
 
 **Initial Release:**
 - SIP/RTP packet analysis
@@ -855,5 +855,5 @@ If you find VoIPScope useful, please consider giving it a star on GitHub! ⭐
 ---
 
 **Latest Release:** v1.1 - Enhanced Edition  
-**Released:** December 2024  
+**Released:** December 2025  
 **Download:** [GitHub Releases](https://github.com/emrekarayazgan/voipscope/releases)

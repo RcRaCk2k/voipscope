@@ -1,8 +1,61 @@
-# VoIPScope v1.1 - Enhanced Edition
+# VoIPScope v1.2 - Enhanced Edition
 
 **Professional VoIP Diagnostic & Analysis Tool**
 
 *"See beyond the call"*
+
+---
+
+**Latest Release:** v1.2 - Enhanced Edition  
+**Released:** January 2026
+
+---
+
+## 🆕 What's New in v1.2
+
+### New Features and Behavior
+- **JSON output support** via `--format json` (in addition to XLSX).
+- **Output location control** with `--source-folder` and `--result-folder`.
+- **Default output folder** is the same folder as each input PCAP when `--result-folder` is not set.
+- **Result naming** uses the input PCAP base name with `.xlsx` or `.json` extension.
+- **Skip existing results** unless `--override` is provided.
+- **Silent mode** with `--silent` to suppress non-error console output.
+- **Python 3.14 compatibility** for pyshark event loop handling.
+- **SDP media IP normalization** (if multiple IPs are present, only the first is used).
+- **JSON meta includes source PCAP path** via `meta.source_pcap`.
+
+### Usage Examples (v1.2)
+
+```bash
+# XLSX output (default)
+python voipscope_v1.2.py --format xlsx
+
+# JSON output
+python voipscope_v1.2.py --format json
+
+# Read PCAPs from a specific folder
+python voipscope_v1.2.py --source-folder /path/to/pcaps
+
+# Write results to a specific folder
+python voipscope_v1.2.py --result-folder /path/to/results
+
+# Silent mode (only errors)
+python voipscope_v1.2.py --silent
+
+# Overwrite existing result files
+python voipscope_v1.2.py --override
+
+# Combine options
+python voipscope_v1.2.py --source-folder /path/to/pcaps \
+  --result-folder /path/to/results --format json --override --silent
+```
+
+### New/Updated Parameters
+- `--format (xlsx|json)`: Select output format.
+- `--source-folder`: Folder containing PCAP files (default: current working directory).
+- `--result-folder`: Folder to save results (default: same folder as each PCAP).
+- `--silent`: Suppress all console output except errors.
+- `--override`: Overwrite existing result files.
 
 ---
 
@@ -102,7 +155,7 @@ This creates test scenarios including:
 ### 2. Run VoIPScope
 
 ```bash
-python voipscope_v1.py
+python voipscope_v1.2.py
 ```
 
 VoIPScope will:
@@ -652,7 +705,7 @@ pip install pyshark pandas openpyxl
 python generate_test_pcaps.py
 
 # Analyze test scenarios
-python voipscope_v1.py
+python voipscope_v1.2.py
 ```
 
 ### Expected Results
@@ -840,7 +893,7 @@ For bug reports, feature requests, or questions:
 
 ---
 
-**VoIPScope v1.1 - Enhanced Edition**
+**VoIPScope v1.2 - Enhanced Edition**
 
 *Making VoIP troubleshooting simple, fast, and accurate.*
 
@@ -853,7 +906,3 @@ For bug reports, feature requests, or questions:
 If you find VoIPScope useful, please consider giving it a star on GitHub! ⭐
 
 ---
-
-**Latest Release:** v1.1 - Enhanced Edition  
-**Released:** December 2025  
-**Download:** [GitHub Releases](https://github.com/emrekarayazgan/voipscope/releases)

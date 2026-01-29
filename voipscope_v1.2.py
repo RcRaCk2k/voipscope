@@ -48,6 +48,7 @@ import asyncio
 import pyshark
 import pandas as pd
 from datetime import datetime
+from pyshark.capture.capture import TSharkCrashException, Capture
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
@@ -58,6 +59,34 @@ from collections import defaultdict
 VERSION = "1.2"
 EDITION = "Enhanced Edition"
 SILENT = False
+
+class CutShortPcapError(Exception):
+    """Raised when a PCAP appears to be cut short in the middle of a packet."""
+    pass
+
+def safe_close_capture(capture):
+    """Close pyshark capture while suppressing tshark crash noise."""
+    try:
+        loop = getattr(capture, 'eventloop', None)
+        if hasattr(capture, 'close_async') and loop:
+            if loop.is_running():
+                try:
+                    fut = asyncio.run_coroutine_threadsafe(capture.close_async(), loop)
+                    fut.result(timeout=2)
+                except Exception:
+                    pass
+            else:
+                loop.run_until_complete(capture.close_async())
+        else:
+            capture.close()
+    except TSharkCrashException:
+        pass
+    except Exception:
+        pass
+    try:
+        capture.close = lambda *args, **kwargs: None
+    except Exception:
+        pass
 
 # Colors
 COLOR_HEADER = 'FF4472C4'
@@ -376,6 +405,7 @@ def get_quality_rating(mos):
 def ensure_event_loop():
     """Ensure asyncio event loop exists for pyshark under Python 3.14+."""
     ensure_asyncio_compat()
+    ensure_pyshark_safe_del()
     try:
         loop = asyncio.get_running_loop()
         if loop.is_closed():
@@ -398,6 +428,15 @@ def ensure_asyncio_compat():
                 return None
         asyncio.SafeChildWatcher = _DummySafeChildWatcher  # type: ignore[attr-defined]
 
+def ensure_pyshark_safe_del():
+    """Prevent noisy exceptions from pyshark Capture.__del__."""
+    if getattr(Capture, '_safe_del_patched', False):
+        return
+    def _safe_del(self):
+        return
+    Capture.__del__ = _safe_del
+    Capture._safe_del_patched = True
+
 # ==================== MAIN ANALYSIS ====================
 
 def analyze_pcap(pcap_path):
@@ -409,6 +448,8 @@ def analyze_pcap(pcap_path):
     calls = {}
     rtp_streams = {}
     issues = []
+    sip_cap = None
+    rtp_cap = None
     
     # Extract SDP
     sdp_data = extract_sdp_tshark(pcap_path)
@@ -478,7 +519,8 @@ def analyze_pcap(pcap_path):
             except:
                 continue
         
-        sip_cap.close()
+        if sip_cap:
+            safe_close_capture(sip_cap)
         log(f"✓ Found {len(calls)} SIP call(s)")
         
         # Merge SDP data
@@ -543,7 +585,8 @@ def analyze_pcap(pcap_path):
             except:
                 continue
         
-        rtp_cap.close()
+        if rtp_cap:
+            safe_close_capture(rtp_cap)
         log(f"✓ Found {len(rtp_streams)} RTP stream(s)")
         
         # Match RTP to SIP and determine direction
@@ -784,8 +827,17 @@ def analyze_pcap(pcap_path):
         log(f"\n✅ Analysis complete!")
         
     except Exception as e:
+        if isinstance(e, TSharkCrashException):
+            msg = str(e).lower()
+            if 'cut short in the middle of a packet' in msg:
+                raise CutShortPcapError(str(e))
         log_error(f"❌ Error during analysis: {e}")
         traceback.print_exc()
+    finally:
+        if sip_cap:
+            safe_close_capture(sip_cap)
+        if rtp_cap:
+            safe_close_capture(rtp_cap)
     
     return calls, rtp_streams, issues
 
@@ -1327,6 +1379,9 @@ def main():
             
             log()
             
+        except CutShortPcapError:
+            log_error(f"\n⚠️  Skipping {pcap_path} (PCAP appears cut short)")
+            continue
         except Exception as e:
             log_error(f"\n❌ Error processing {pcap_path}")
             traceback.print_exc()

@@ -484,6 +484,7 @@ def analyze_pcap(pcap_path):
                     'End-Time': ts,
                     'Methods': [],
                     'Statuses': [],
+                    'Packets': {},
                     'From-Tag': '',
                     'To-Tag': '',
                     'SDP-Caller': {},
@@ -497,15 +498,70 @@ def analyze_pcap(pcap_path):
                 if ts > entry['End-Time']:
                     entry['End-Time'] = ts
                 
-                if method and method not in entry['Methods']:
-                    entry['Methods'].append(method)
-                if status and status not in entry['Statuses']:
-                    entry['Statuses'].append(status)
+                pkt_num = None
+                pkt_details = None
+                try:
+                    pkt_num = int(pkt.number)
+                except Exception:
+                    pkt_num = None
+
+                if method:
+                    pkt_details = pkt_num
+                    entry['Methods'].append({
+                        'method': method,
+                        'packet_number': pkt_num
+                    })
+                if status:
+                    pkt_details = pkt_num
+                    entry['Statuses'].append({
+                        'status': status,
+                        'packet_number': pkt_num
+                    })
                 
                 # NEW in v1.1: Capture 200 OK timestamp for clipped audio detection
                 if status == '200' and entry['200_OK_Time'] is None:
                     entry['200_OK_Time'] = ts
                 
+                # Store packet details
+                if pkt_details is not None and pkt_details not in entry['Packets']:
+                    src_ip = pkt.ip.src if hasattr(pkt, 'ip') else ''
+                    dst_ip = pkt.ip.dst if hasattr(pkt, 'ip') else ''
+                    ip_proto = 0
+                    if hasattr(pkt, 'ip') and hasattr(pkt.ip, 'proto'):
+                        try:
+                            ip_proto = int(pkt.ip.proto)
+                        except Exception:
+                            ip_proto = 0
+
+                    if hasattr(pkt, 'udp'):
+                        src_port = int(pkt.udp.srcport)
+                        dst_port = int(pkt.udp.dstport)
+                        if not ip_proto:
+                            ip_proto = 17
+                    elif hasattr(pkt, 'tcp'):
+                        src_port = int(pkt.tcp.srcport)
+                        dst_port = int(pkt.tcp.dstport)
+                        if not ip_proto:
+                            ip_proto = 6
+                    else:
+                        src_port = 0
+                        dst_port = 0
+                    
+                    payload = {
+                        field: getattr(pkt.sip, field)
+                        for field in pkt.sip.field_names
+                    }
+                    
+                    entry['Packets'][pkt_num] = {
+                        'timestamp': ts,
+                        'src_ip': src_ip,
+                        'src_port': src_port,
+                        'dst_ip': dst_ip,
+                        'dst_port': dst_port,
+                        'payload': payload,
+                        'ip_proto': ip_proto
+                    }
+
                 # Extract TAGs
                 if 'tag=' in from_hdr:
                     tag = from_hdr.split('tag=')[-1].split(';')[0].split('>')[0]
@@ -515,9 +571,9 @@ def analyze_pcap(pcap_path):
                     tag = to_hdr.split('tag=')[-1].split(';')[0].split('>')[0]
                     if tag and not entry['To-Tag']:
                         entry['To-Tag'] = tag
-                
-            except:
-                continue
+            
+            except Exception as e:
+                log_error(f"❌ Error during packet-decoding: {e}")
         
         if sip_cap:
             safe_close_capture(sip_cap)
